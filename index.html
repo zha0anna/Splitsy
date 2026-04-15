@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% block title %}Splitsy — Browse Splits Near You{% endblock %}
+{% block extra_head %}
+<style>
+  .hero {
+    background: linear-gradient(140deg, var(--c5) 0%, var(--c4) 55%, var(--c3) 100%);
+    padding: 4rem 1.5rem 3.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content:'';position:absolute;inset:0;
+    background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-tag { display:inline-block;background:var(--c2);color:var(--c5);font-size:0.75rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:0.3rem 0.9rem;border-radius:99px;margin-bottom:1.2rem; }
+  .hero h1 { font-family:var(--font-display);font-size:clamp(2rem,5vw,3.4rem);font-weight:900;color:#fff;line-height:1.1;letter-spacing:-1px;margin-bottom:1rem; }
+  .hero h1 em { font-style:italic;color:var(--c1); }
+  .hero p { color:rgba(255,255,255,0.78);font-size:1.05rem;max-width:500px;margin:0 auto 2rem; }
+  .hero-ctas { display:flex;gap:1rem;justify-content:center;flex-wrap:wrap; }
+  .hero-stats { display:flex;justify-content:center;gap:2.5rem;margin-top:2.5rem;flex-wrap:wrap; }
+  .hero-stat { text-align:center;color:rgba(255,255,255,0.9); }
+  .hero-stat .num { font-family:var(--font-display);font-size:2rem;font-weight:900;color:var(--c1);display:block;line-height:1; }
+  .hero-stat .label { font-size:0.78rem;opacity:0.7; }
+
+  .filters-bar { background:#fff;border-bottom:1px solid var(--warm-200);padding:1rem 1.5rem;position:sticky;top:64px;z-index:100;box-shadow:var(--shadow-sm); }
+  .filters-inner { max-width:1000px;margin:0 auto;display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap; }
+  .filter-label { font-size:0.8rem;font-weight:600;color:var(--text-light);white-space:nowrap; }
+  .filter-select { padding:0.4rem 0.75rem;border-radius:var(--radius-sm);border:1.5px solid var(--warm-200);background:var(--cream);font-family:var(--font-body);font-size:0.88rem;color:var(--text-dark);cursor:pointer; }
+  .filter-select:focus { outline:none;border-color:var(--c3); }
+
+  .section-title { font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:var(--text-dark);margin:2rem 0 1.1rem; }
+
+  .listings-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1.2rem;margin-bottom:3rem; }
+
+  /* LISTING CARD */
+  .listing-card { background:#fff;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:column;border:1.5px solid transparent;transition:box-shadow 0.2s,transform 0.2s,border-color 0.2s;color:inherit; }
+  .listing-card:hover { box-shadow:var(--shadow-lg);transform:translateY(-3px);border-color:var(--c2); }
+  .listing-card.sold-out { opacity:0.55; }
+
+  /* ICON TOP (browse cards use emoji icon, not photo) */
+  .card-icon-top {
+    background: linear-gradient(135deg, var(--c5), var(--c4));
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.2rem;
+    position: relative;
+  }
+  .card-badges-top { position:absolute;top:0.65rem;right:0.65rem;display:flex;flex-direction:column;gap:0.3rem;align-items:flex-end; }
+
+  .card-body { padding:1rem 1.25rem 0.8rem;flex:1; }
+  .card-item-name { font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--text-dark);margin-bottom:0.1rem; }
+  .card-community { font-size:0.78rem;color:var(--text-light);margin-bottom:0.6rem;display:flex;align-items:center;gap:0.3rem; }
+  .card-seller { font-size:0.8rem;color:var(--text-mid);margin-bottom:0.7rem; }
+  .card-price-row { display:flex;align-items:baseline;gap:0.4rem;margin-bottom:0.4rem; }
+  .card-price { font-family:var(--font-display);font-size:1.6rem;font-weight:900;color:var(--c4); }
+  .card-price-unit { font-size:0.78rem;color:var(--text-light); }
+  .savings-chip { font-size:0.72rem;font-weight:700;color:var(--c4);background:#d4ecd8;padding:0.18rem 0.55rem;border-radius:99px; }
+
+  .portions-wrap { margin:0.6rem 0 0.2rem; }
+  .portions-label { font-size:0.72rem;color:var(--text-light);display:flex;justify-content:space-between;margin-bottom:0.25rem; }
+  .portions-bar { background:var(--warm-200);border-radius:99px;height:5px;overflow:hidden; }
+  .portions-fill { background:var(--c3);height:100%;border-radius:99px; }
+  .portions-fill.urgent { background:var(--yellow); }
+  .portions-fill.full { background:var(--red-soft); }
+
+  .card-footer { padding:0.7rem 1.25rem;background:var(--cream);border-top:1px solid var(--warm-100);font-size:0.78rem;color:var(--text-light);display:flex;justify-content:space-between;align-items:center; }
+
+  .empty-state { text-align:center;padding:4rem 1rem;color:var(--text-light); }
+  .empty-state .icon { font-size:3rem;margin-bottom:1rem; }
+  .empty-state h3 { font-family:var(--font-display);font-size:1.4rem;color:var(--text-mid);margin-bottom:0.5rem; }
+
+  .cta-band { background:var(--c5);padding:3rem 1.5rem;text-align:center;margin-top:2rem; }
+  .cta-band h2 { font-family:var(--font-display);color:#fff;font-size:1.75rem;margin-bottom:0.6rem; }
+  .cta-band p { color:rgba(255,255,255,0.65);margin-bottom:1.5rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-tag">🌿 Atlanta's Community Bulk App</div>
+  <h1>Split the haul.<br><em>Share the savings.</em></h1>
+  <p>Factory-sealed units. Bulk prices. No membership required. Your neighbors are splitting right now.</p>
+  <div class="hero-ctas">
+    <a href="#listings" class="btn btn-yellow btn-lg">Browse Splits Near You</a>
+    {% if current_user %}
+      <a href="/sell" class="btn btn-outline btn-lg" style="color:#fff;border-color:rgba(255,255,255,0.35);">+ List a Split</a>
+    {% else %}
+      <a href="/signup" class="btn btn-outline btn-lg" style="color:#fff;border-color:rgba(255,255,255,0.35);">Join Free →</a>
+    {% endif %}
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><span class="num">50+</span><span class="label">Products in Catalog</span></div>
+    <div class="hero-stat"><span class="num">{{ listings|length }}</span><span class="label">Active Splits</span></div>
+    <div class="hero-stat"><span class="num">$43</span><span class="label">Avg. Saved Per Split</span></div>
+    <div class="hero-stat"><span class="num">10</span><span class="label">Atlanta Communities</span></div>
+  </div>
+</section>
+
+<!-- FILTERS -->
+<div class="filters-bar">
+  <form class="filters-inner" method="GET" action="/">
+    <span class="filter-label">Filter:</span>
+    <select name="community" class="filter-select" onchange="this.form.submit()">
+      <option value="all" {% if selected_community=='all' %}selected{% endif %}>All Communities</option>
+      {% for c in communities %}
+        <option value="{{ c['id'] }}" {% if selected_community==c['id'] %}selected{% endif %}>{{ c['name'] }}</option>
+      {% endfor %}
+    </select>
+    <select name="category" class="filter-select" onchange="this.form.submit()">
+      <option value="all" {% if selected_category=='all' %}selected{% endif %}>All Categories</option>
+      {% for cat in categories %}
+        <option value="{{ cat }}" {% if selected_category==cat %}selected{% endif %}>{{ cat }}</option>
+      {% endfor %}
+    </select>
+    <a href="/communities" class="btn btn-sm btn-outline" style="white-space:nowrap;">🗺 View Map</a>
+  </form>
+</div>
+
+<!-- LISTINGS -->
+<div class="container" id="listings">
+  <h2 class="section-title">Active Splits</h2>
+  {% if listings %}
+    <div class="listings-grid">
+      {% for l in listings %}
+        {% set portions_left = l['portions_total'] - l['portions_claimed'] %}
+        {% set sold_out = portions_left <= 0 %}
+        {% set fill_pct = ((l['portions_claimed'] / l['portions_total']) * 100)|int if l['portions_total'] > 0 else 0 %}
+        {% set savings = (l['retail_price'] or 0) - l['price_per_portion'] %}
+        {% set savings_pct = ((savings / l['retail_price']) * 100)|int if l['retail_price'] and l['retail_price'] > 0 else 0 %}
+        <a href="/listing/{{ l['id'] }}" class="listing-card {% if sold_out %}sold-out{% endif %}">
+          <div class="card-icon-top">
+            {{ l['emoji'] }}
+            <div class="card-badges-top">
+              {% if l['verified'] %}<span class="badge badge-green">✓ Verified</span>{% endif %}
+              {% if l['model']=='pool' %}<span class="badge badge-pool">Pool</span>
+              {% else %}<span class="badge badge-pioneer">Ready Now</span>{% endif %}
+              {% if sold_out %}<span class="badge badge-gray">Sold Out</span>{% endif %}
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-item-name">{{ l['item'] }}</div>
+            <div class="card-community">📍 {{ l['community_name'] or 'Atlanta' }} · {{ l['bulk_store'] }}</div>
+            <div class="card-seller"><span class="stars">★</span> {{ "%.1f"|format(l['seller_rating']) }} · {{ l['seller_name'] }}</div>
+            <div class="card-price-row">
+              <span class="card-price">${{ "%.2f"|format(l['price_per_portion']) }}</span>
+              <span class="card-price-unit">/ {{ l['portion_size'] }}</span>
+              {% if savings_pct > 0 %}<span class="savings-chip">Save {{ savings_pct }}%</span>{% endif %}
+            </div>
+            <div class="portions-wrap">
+              <div class="portions-label">
+                <span>{{ portions_left }} of {{ l['portions_total'] }} left</span>
+                <span>{{ fill_pct }}% claimed</span>
+              </div>
+              <div class="portions-bar">
+                <div class="portions-fill {% if sold_out %}full{% elif portions_left == 1 %}urgent{% endif %}" style="width:{{ fill_pct }}%"></div>
+              </div>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>{{ l['category'] }}</span>
+            <span>{{ l['pickup_window'].split(',')[0] if l['pickup_window'] and ',' in l['pickup_window'] else (l['pickup_window'] or '') }}</span>
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="icon">🛒</div>
+      <h3>No splits found</h3>
+      <p>Try a different filter, or be the first to list one!</p>
+      <a href="/sell" class="btn btn-primary mt-3">+ List a Split</a>
+    </div>
+  {% endif %}
+</div>
+
+<div class="cta-band">
+  <h2>Just bought in bulk? <em style="font-style:italic;color:var(--c1);">List your split.</em></h2>
+  <p>Zero commission for founding sellers. Takes 2 minutes.</p>
+  <a href="{% if current_user %}/sell{% else %}/signup{% endif %}" class="btn btn-yellow btn-lg">Start a Listing →</a>
+</div>
+{% endblock %}

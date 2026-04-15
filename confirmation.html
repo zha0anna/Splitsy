@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}You're In! — Splitsy{% endblock %}
+{% block extra_head %}
+<style>
+  .confirm-wrap { max-width:520px;margin:3rem auto 5rem;padding:0 1.5rem;text-align:center; }
+  .confirm-card { background:#fff;border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);overflow:hidden;margin-bottom:1.5rem; }
+  .confirm-top { background:linear-gradient(135deg,var(--c4),var(--c3));padding:2.5rem 2rem 2rem; }
+  .confirm-check { font-size:3.5rem;margin-bottom:0.75rem;animation:pop 0.4s cubic-bezier(0.36,0.07,0.19,0.97); }
+  @keyframes pop{0%{transform:scale(0.5);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+  .confirm-title { font-family:var(--font-display);font-size:2rem;font-weight:900;color:#fff;margin-bottom:0.3rem; }
+  .confirm-subtitle { color:rgba(255,255,255,0.78);font-size:1rem; }
+  .confirm-body { padding:1.75rem;text-align:left; }
+  .confirm-row { display:flex;justify-content:space-between;align-items:flex-start;padding:0.7rem 0;border-bottom:1px solid var(--warm-200);font-size:0.9rem; }
+  .confirm-row:last-child { border-bottom:none; }
+  .confirm-row-label { color:var(--text-light);font-weight:500; }
+  .confirm-row-value { font-weight:600;text-align:right;max-width:60%; }
+  .steps-card { background:#f4f9f5;border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:1.5rem;text-align:left; }
+  .steps-title { font-family:var(--font-display);font-size:1.1rem;font-weight:700;color:var(--c4);margin-bottom:1rem; }
+  .step-item { display:flex;gap:0.75rem;align-items:flex-start;margin-bottom:0.75rem; }
+  .step-num { width:26px;height:26px;background:var(--c4);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.78rem;font-weight:700;flex-shrink:0; }
+  .step-text { font-size:0.88rem;color:var(--text-mid);padding-top:0.25rem; }
+  .rate-box { background:var(--yellow);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem; }
+  .rate-box p { font-size:0.9rem;color:var(--c5);font-weight:500;margin-bottom:0.6rem; }
+  .star-btns { display:flex;justify-content:center;gap:0.5rem; }
+  .star-btn { font-size:1.9rem;cursor:pointer;background:none;border:none;padding:0;transition:transform 0.1s; }
+  .star-btn:hover { transform:scale(1.2); }
+  .rated-msg { display:none;font-weight:700;color:var(--c4);margin-top:0.5rem; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="confirm-wrap">
+  <div class="confirm-card">
+    <div class="confirm-top">
+      <div class="confirm-check">🎉</div>
+      <div class="confirm-title">You're in!</div>
+      <div class="confirm-subtitle">Your portion is reserved. Here are your details.</div>
+    </div>
+    <div class="confirm-body">
+      {% if claim %}
+        <div class="confirm-row"><span class="confirm-row-label">Item</span><span class="confirm-row-value">{{ claim['item'] }}</span></div>
+        <div class="confirm-row"><span class="confirm-row-label">Amount Paid</span><span class="confirm-row-value" style="color:var(--c4);">${{ "%.2f"|format(claim['amount'] or 0) }} <span style="font-size:0.72rem;color:var(--text-light);">(simulated)</span></span></div>
+        <div class="confirm-row"><span class="confirm-row-label">Meetup Spot</span><span class="confirm-row-value">{{ claim['meetup_spot'] }}</span></div>
+        <div class="confirm-row"><span class="confirm-row-label">Pickup Window</span><span class="confirm-row-value">{{ claim['pickup_window'] }}</span></div>
+        <div class="confirm-row"><span class="confirm-row-label">Seller</span><span class="confirm-row-value">{{ claim['seller_name'] }}</span></div>
+      {% endif %}
+    </div>
+  </div>
+  <div class="steps-card">
+    <div class="steps-title">What happens next?</div>
+    <div class="step-item"><div class="step-num">1</div><div class="step-text">You'll get a notification when the seller confirms. (In the real app — SMS & push.)</div></div>
+    <div class="step-item"><div class="step-num">2</div><div class="step-text">Head to <strong>{{ claim['meetup_spot'] if claim else 'the meetup spot' }}</strong> during the pickup window.</div></div>
+    <div class="step-item"><div class="step-num">3</div><div class="step-text">Collect your factory-sealed unit. Quick, safe, public. No repackaging — exactly as it left the store.</div></div>
+    <div class="step-item"><div class="step-num">4</div><div class="step-text">Rate your exchange to keep the Splitsy community honest.</div></div>
+  </div>
+  <div class="rate-box">
+    <p>⭐ Rate your seller after the exchange:</p>
+    <div class="star-btns" id="stars">
+      {% for i in range(1,6) %}<button class="star-btn" onclick="rate({{ i }})">★</button>{% endfor %}
+    </div>
+    <div class="rated-msg" id="rated-msg">Thanks for rating! 🙌</div>
+  </div>
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+    <a href="/" class="btn btn-primary btn-lg" style="flex:1;text-align:center;">Browse More Splits</a>
+    <a href="/dashboard" class="btn btn-outline btn-lg" style="flex:1;text-align:center;">My Dashboard</a>
+  </div>
+</div>
+<script>
+function rate(n) {
+  const stars = document.querySelectorAll('.star-btn');
+  stars.forEach((s,i) => s.style.color = i < n ? '#111D13' : '#ccc');
+  {% if claim %}
+  fetch('/rate/{{ claim["id"] }}', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:'rating='+n });
+  {% endif %}
+  document.getElementById('rated-msg').style.display='block';
+  document.getElementById('stars').style.pointerEvents='none';
+}
+</script>
+{% endblock %}

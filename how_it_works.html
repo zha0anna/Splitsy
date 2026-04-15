@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}How Splitsy Works{% endblock %}
+{% block extra_head %}
+<style>
+  .hiw-hero { background:linear-gradient(135deg,var(--c5),var(--c4));padding:4rem 1.5rem;text-align:center; }
+  .hiw-hero h1 { font-family:var(--font-display);font-size:2.7rem;font-weight:900;color:#fff;margin-bottom:0.75rem; }
+  .hiw-hero p { color:rgba(255,255,255,0.75);font-size:1.05rem;max-width:500px;margin:0 auto; }
+  .hiw-section { max-width:800px;margin:3rem auto;padding:0 1.5rem; }
+  .hiw-section h2 { font-family:var(--font-display);font-size:1.55rem;font-weight:800;color:var(--text-dark);margin-bottom:1.4rem;text-align:center; }
+  .steps { display:flex;flex-direction:column;gap:1.1rem;margin-bottom:3rem; }
+  .step { display:flex;gap:1.25rem;align-items:flex-start;background:#fff;border-radius:var(--radius-lg);padding:1.4rem;box-shadow:var(--shadow-sm); }
+  .step-icon { font-size:2rem;flex-shrink:0;width:52px;height:52px;background:#f4f9f5;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center; }
+  .step h3 { font-family:var(--font-display);font-size:1.05rem;font-weight:700;margin-bottom:0.3rem; }
+  .step p { font-size:0.88rem;color:var(--text-mid); }
+  .sealed-callout { background:linear-gradient(135deg,var(--c4),var(--c3));border-radius:var(--radius-xl);padding:2rem;text-align:center;color:#fff;margin-bottom:3rem; }
+  .sealed-callout h2 { font-family:var(--font-display);font-size:1.5rem;font-weight:900;margin-bottom:0.75rem; }
+  .sealed-callout p { font-size:0.95rem;opacity:0.85;max-width:520px;margin:0 auto; }
+  .models-grid { display:grid;grid-template-columns:1fr 1fr;gap:1.1rem;margin-bottom:3rem; }
+  @media(max-width:560px){.models-grid{grid-template-columns:1fr;}}
+  .model-card { background:#fff;border-radius:var(--radius-lg);padding:1.4rem;box-shadow:var(--shadow-sm);border-top:4px solid var(--c3); }
+  .model-card.pool { border-top-color:var(--yellow); }
+  .model-card h3 { font-family:var(--font-display);font-size:1.1rem;font-weight:800;margin-bottom:0.4rem; }
+  .model-card p { font-size:0.85rem;color:var(--text-mid);margin-bottom:0.6rem; }
+  .model-card .best { font-size:0.78rem;font-weight:700;color:var(--c3); }
+  .trust-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.9rem;margin-bottom:3rem; }
+  .trust-card { background:#fff;border-radius:var(--radius-lg);padding:1.2rem;box-shadow:var(--shadow-sm);text-align:center; }
+  .trust-card .icon { font-size:1.8rem;margin-bottom:0.5rem; }
+  .trust-card h4 { font-family:var(--font-display);font-size:0.97rem;font-weight:700;margin-bottom:0.3rem; }
+  .trust-card p { font-size:0.8rem;color:var(--text-mid); }
+  .cta-band { background:var(--c5);border-radius:var(--radius-xl);padding:2.5rem;text-align:center;margin-bottom:3rem; }
+  .cta-band h2 { font-family:var(--font-display);color:#fff;font-size:1.7rem;margin-bottom:0.5rem; }
+  .cta-band p { color:rgba(255,255,255,0.65);margin-bottom:1.5rem; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="hiw-hero">
+  <h1>How Splitsy Works</h1>
+  <p>Factory-sealed units. Bulk prices. No membership. No repackaging. Ever.</p>
+</div>
+<div class="hiw-section">
+  <h2>The Core Rule</h2>
+  <div class="sealed-callout">
+    <h2>🔒 Sealed Units Only — Always</h2>
+    <p>Every item on Splitsy must be factory-sealed in its original, untouched packaging — exactly as it left the store shelf. No repackaging. No handling. No guesswork. If it's sealed, it's safe.</p>
+  </div>
+
+  <h2>Six Simple Steps</h2>
+  <div class="steps">
+    <div class="step"><div class="step-icon">🛒</div><div><h3>1. Seller makes a bulk purchase</h3><p>Shop at Costco, Sam's Club, Amazon Bulk, or another bulk retailer. Buy only factory-sealed multi-packs.</p></div></div>
+    <div class="step"><div class="step-icon">📋</div><div><h3>2. Seller lists individual sealed units</h3><p>Scan the item, upload the receipt, set a per-unit price within the markup cap, and select a public meetup spot.</p></div></div>
+    <div class="step"><div class="step-icon">🔍</div><div><h3>3. Buyer browses nearby listings</h3><p>Filter by neighborhood community, product category, or bulk store. Verified prices and seller ratings visible before claiming.</p></div></div>
+    <div class="step"><div class="step-icon">💳</div><div><h3>4. Buyer claims and pays</h3><p>Claim one or more units and pay securely in-app. Payment is held in escrow until the exchange is confirmed.</p></div></div>
+    <div class="step"><div class="step-icon">🤝</div><div><h3>5. Exchange at a public spot</h3><p>Meet at a pre-designated public location — building lobby, park, or community center — for a quick handoff of sealed units.</p></div></div>
+    <div class="step"><div class="step-icon">⭐</div><div><h3>6. Both parties rate the exchange</h3><p>Ratings keep the community honest. Low-rated sellers surface less prominently in search results.</p></div></div>
+  </div>
+
+  <h2>Two Ways to Split</h2>
+  <div class="models-grid">
+    <div class="model-card"><h3>✅ Pioneer Model</h3><p>Seller buys first, lists units immediately. Buyers get instant availability — no waiting.</p><div class="best">Best for: Non-perishables, household goods, personal care</div></div>
+    <div class="model-card pool"><h3>🤝 Pool Model</h3><p>Post a deal, buyers commit and pay upfront. Purchase happens once the group is complete.</p><div class="best">Best for: Higher-cost items where seller wants guaranteed demand</div></div>
+  </div>
+
+  <h2>How We Keep It Fair</h2>
+  <div class="trust-grid">
+    <div class="trust-card"><div class="icon">🧾</div><h4>Receipt Verification</h4><p>Sellers upload receipts. Splitsy auto-calculates cost and enforces markup cap.</p></div>
+    <div class="trust-card"><div class="icon">🔒</div><h4>Sealed Units Only</h4><p>Every listing must be factory-sealed. Flaggable by buyers. No exceptions.</p></div>
+    <div class="trust-card"><div class="icon">🛡️</div><h4>Markup Cap</h4><p>Prices capped at a regulated % above cost. Splitsy stays a savings platform.</p></div>
+    <div class="trust-card"><div class="icon">🚩</div><h4>Community Flagging</h4><p>Buyers flag anything off. Platform reviews within 24 hours.</p></div>
+    <div class="trust-card"><div class="icon">⭐</div><h4>Ratings System</h4><p>Both parties rate after each exchange. Accountability built in.</p></div>
+  </div>
+
+  <div class="cta-band">
+    <h2>Ready to start splitting?</h2>
+    <p>Browse active splits in your Atlanta community — or list your own in 2 minutes.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="/" class="btn btn-yellow btn-lg">Browse Splits</a>
+      <a href="{% if current_user %}/sell{% else %}/signup{% endif %}" class="btn btn-outline btn-lg" style="color:#fff;border-color:rgba(255,255,255,0.35);">+ List a Split</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

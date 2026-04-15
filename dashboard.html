@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard — Splitsy{% endblock %}
+{% block extra_head %}
+<style>
+  .dash-wrap { max-width:960px;margin:2rem auto 4rem;padding:0 1.5rem; }
+  .dash-header { background:linear-gradient(135deg,var(--c5),var(--c4));border-radius:var(--radius-xl);padding:2rem;margin-bottom:2rem;display:flex;align-items:center;gap:1.5rem; }
+  .dash-avatar { width:64px;height:64px;background:var(--c3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:900;color:#fff;flex-shrink:0; }
+  .dash-name { font-family:var(--font-display);font-size:1.6rem;font-weight:900;color:#fff; }
+  .dash-sub { color:rgba(255,255,255,0.65);font-size:0.88rem;margin-top:0.2rem; }
+  .dash-stats { display:flex;gap:2rem;margin-top:0.75rem;flex-wrap:wrap; }
+  .dash-stat { text-align:center; }
+  .dash-stat .num { font-family:var(--font-display);font-size:1.4rem;font-weight:900;color:var(--c1); }
+  .dash-stat .lbl { font-size:0.72rem;color:rgba(255,255,255,0.55); }
+
+  .tabs { display:flex;gap:0.25rem;margin-bottom:1.5rem;background:#fff;padding:0.4rem;border-radius:var(--radius-lg);box-shadow:var(--shadow-sm); }
+  .tab { padding:0.55rem 1.25rem;border-radius:var(--radius-md);font-size:0.9rem;font-weight:600;cursor:pointer;color:var(--text-light);border:none;background:none;transition:background 0.15s,color 0.15s; }
+  .tab.active { background:var(--c4);color:#fff; }
+  .tab-panel { display:none; }
+  .tab-panel.active { display:block; }
+
+  .listing-row { background:#fff;border-radius:var(--radius-md);padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;box-shadow:var(--shadow-sm);margin-bottom:0.75rem; }
+  .listing-row-emoji { font-size:1.8rem;flex-shrink:0; }
+  .listing-row-info { flex:1; }
+  .listing-row-name { font-weight:700;font-size:0.97rem;margin-bottom:0.1rem; }
+  .listing-row-meta { font-size:0.78rem;color:var(--text-light); }
+  .listing-row-right { text-align:right;flex-shrink:0; }
+  .listing-row-price { font-family:var(--font-display);font-size:1.2rem;font-weight:900;color:var(--c4); }
+  .listing-row-status { font-size:0.72rem;font-weight:600; }
+
+  .claim-row { background:#fff;border-radius:var(--radius-md);padding:1rem 1.25rem;display:flex;align-items:flex-start;gap:1rem;box-shadow:var(--shadow-sm);margin-bottom:0.75rem; }
+  .claim-emoji { font-size:1.8rem;flex-shrink:0; }
+  .claim-info { flex:1; }
+  .claim-item { font-weight:700;font-size:0.95rem; }
+  .claim-meta { font-size:0.78rem;color:var(--text-light);margin-top:0.2rem; }
+
+  .comm-pill { display:inline-flex;align-items:center;gap:0.5rem;padding:0.5rem 1rem;background:#fff;border-radius:var(--radius-md);box-shadow:var(--shadow-sm);font-size:0.88rem;font-weight:600;color:var(--c4);margin:0.3rem; }
+
+  .empty-dash { text-align:center;padding:3rem 1rem;color:var(--text-light); }
+  .empty-dash .icon { font-size:2.5rem;margin-bottom:0.75rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dash-wrap">
+  <!-- HEADER -->
+  <div class="dash-header">
+    <div class="dash-avatar">{{ user['name'][0] }}</div>
+    <div style="flex:1;">
+      <div class="dash-name">{{ user['name'] }}</div>
+      <div class="dash-sub">{{ user['email'] }} {% if user['is_founding_member'] %}· 🏅 Founding Member · Zero commission{% endif %}</div>
+      <div class="dash-stats">
+        <div class="dash-stat"><div class="num">{{ my_listings|length }}</div><div class="lbl">My Listings</div></div>
+        <div class="dash-stat"><div class="num">{{ my_claims|length }}</div><div class="lbl">Items Claimed</div></div>
+        <div class="dash-stat"><div class="num">{{ "%.1f"|format(user['rating']) }}⭐</div><div class="lbl">Seller Rating</div></div>
+        <div class="dash-stat"><div class="num">{{ my_communities|length }}</div><div class="lbl">Communities</div></div>
+      </div>
+    </div>
+    <a href="/sell" class="btn btn-yellow">+ New Listing</a>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('listings',this)">My Listings</button>
+    <button class="tab" onclick="showTab('claims',this)">My Claims</button>
+    <button class="tab" onclick="showTab('communities',this)">My Communities</button>
+  </div>
+
+  <!-- MY LISTINGS -->
+  <div class="tab-panel active" id="tab-listings">
+    {% if my_listings %}
+      {% for l in my_listings %}
+        {% set portions_left = l['portions_total'] - l['portions_claimed'] %}
+        <a href="/listing/{{ l['id'] }}" style="text-decoration:none;display:block;">
+          <div class="listing-row">
+            <div class="listing-row-emoji">{{ l['emoji'] }}</div>
+            <div class="listing-row-info">
+              <div class="listing-row-name">{{ l['item'] }}</div>
+              <div class="listing-row-meta">{{ l['community_name'] or 'Atlanta' }} · {{ l['portion_size'] }} · {{ l['portions_claimed'] }}/{{ l['portions_total'] }} claimed</div>
+            </div>
+            <div class="listing-row-right">
+              <div class="listing-row-price">${{ "%.2f"|format(l['price_per_portion']) }}</div>
+              <div class="listing-row-status" style="color:{% if portions_left==0 %}var(--red-soft){% else %}var(--c3){% endif %};">
+                {% if portions_left==0 %}Sold out{% else %}{{ portions_left }} left{% endif %}
+              </div>
+            </div>
+          </div>
+        </a>
+      {% endfor %}
+    {% else %}
+      <div class="empty-dash"><div class="icon">📦</div><p>No listings yet. <a href="/sell" style="color:var(--c3);font-weight:600;">Create your first split →</a></p></div>
+    {% endif %}
+  </div>
+
+  <!-- MY CLAIMS -->
+  <div class="tab-panel" id="tab-claims">
+    {% if my_claims %}
+      {% for c in my_claims %}
+        <div class="claim-row">
+          <div class="claim-emoji">{{ c['emoji'] }}</div>
+          <div class="claim-info">
+            <div class="claim-item">{{ c['item'] }}</div>
+            <div class="claim-meta">Seller: {{ c['seller_name'] }} · Meetup: {{ c['meetup_spot'] }}</div>
+            <div class="claim-meta">🕐 {{ c['pickup_window'] }}</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;">
+            <div style="font-family:var(--font-display);font-weight:900;color:var(--c4);">${{ "%.2f"|format(c['amount'] or 0) }}</div>
+            <span class="badge badge-green" style="margin-top:0.3rem;">Claimed</span>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="empty-dash"><div class="icon">🛒</div><p>No claims yet. <a href="/" style="color:var(--c3);font-weight:600;">Browse splits →</a></p></div>
+    {% endif %}
+  </div>
+
+  <!-- MY COMMUNITIES -->
+  <div class="tab-panel" id="tab-communities">
+    {% if my_communities %}
+      <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem;">
+        {% for c in my_communities %}
+          <a href="/communities" class="comm-pill">🌿 {{ c['name'] }}</a>
+        {% endfor %}
+      </div>
+      <a href="/communities" class="btn btn-outline">Manage Communities →</a>
+    {% else %}
+      <div class="empty-dash"><div class="icon">🌿</div><p>You haven't joined any communities yet. <a href="/communities" style="color:var(--c3);font-weight:600;">Find yours →</a></p></div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+{% endblock %}

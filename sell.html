@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}List a Split — Splitsy{% endblock %}
+{% block extra_head %}
+<style>
+  .sell-wrap { max-width:660px;margin:2.5rem auto 4rem;padding:0 1.5rem; }
+  .sell-header h1 { font-family:var(--font-display);font-size:2.1rem;font-weight:900;margin-bottom:0.4rem; }
+  .sell-header p { color:var(--text-mid);margin-bottom:1.75rem; }
+  .sell-card { background:#fff;border-radius:var(--radius-xl);box-shadow:var(--shadow-md);padding:1.75rem;margin-bottom:1.25rem; }
+  .sell-card h2 { font-family:var(--font-display);font-size:1.1rem;font-weight:700;margin-bottom:1.25rem;display:flex;align-items:center;gap:0.5rem; }
+  .form-row-2 { display:grid;grid-template-columns:1fr 1fr;gap:1rem; }
+  @media(max-width:500px){.form-row-2{grid-template-columns:1fr;}}
+  .model-toggle { display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1rem; }
+  .model-option { position:relative; }
+  .model-option input[type="radio"] { position:absolute;opacity:0; }
+  .model-label { display:block;padding:1rem;border-radius:var(--radius-md);border:2px solid var(--warm-200);cursor:pointer;transition:border-color 0.15s,background 0.15s; }
+  .model-option input:checked + .model-label { border-color:var(--c3);background:#f4f9f5; }
+  .model-label strong { display:block;font-size:0.93rem;margin-bottom:0.2rem; }
+  .model-label span { font-size:0.78rem;color:var(--text-light); }
+  .sealed-rule { background:#e8f4ea;border:1.5px solid var(--c2);border-radius:var(--radius-md);padding:0.85rem 1rem;font-size:0.83rem;color:var(--c4);display:flex;gap:0.5rem;align-items:flex-start;margin-bottom:1.25rem; }
+  .markup-notice { background:#f4f9f5;border:1.5px solid var(--c2);border-radius:var(--radius-md);padding:0.85rem 1rem;font-size:0.83rem;color:var(--c4);display:flex;gap:0.5rem;margin-top:0.75rem; }
+  .receipt-box { border:2px dashed var(--warm-200);border-radius:var(--radius-md);padding:1.5rem;text-align:center;color:var(--text-light);font-size:0.88rem;cursor:pointer;transition:border-color 0.15s,background 0.15s; }
+  .receipt-box:hover { border-color:var(--c3);background:#f4f9f5; }
+  .receipt-box .icon { font-size:2rem;margin-bottom:0.4rem; }
+  .founder-badge { background:linear-gradient(135deg,var(--c5),var(--c4));color:#fff;border-radius:var(--radius-lg);padding:1.1rem 1.5rem;display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem; }
+  .founder-badge .icon { font-size:1.8rem;flex-shrink:0; }
+  .founder-badge h3 { font-family:var(--font-display);font-size:0.97rem;font-weight:700;margin-bottom:0.15rem; }
+  .founder-badge p { font-size:0.8rem;opacity:0.75; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="sell-wrap">
+  <div class="sell-header">
+    <h1>List a Split</h1>
+    <p>Bought a bulk multi-pack? List the individual sealed units and earn back what you spent — while your neighbors save.</p>
+  </div>
+  <div class="founder-badge">
+    <div class="icon">🏅</div>
+    <div>
+      <h3>Founding Seller — Atlanta Beta</h3>
+      <p>Zero platform commission for 6 months. Permanent Founding Member badge on your profile.</p>
+    </div>
+  </div>
+
+  <form method="POST" action="/sell">
+    <div class="sell-card">
+      <h2>📦 The Item</h2>
+      <div class="sealed-rule">🔒 <span><strong>Factory-Sealed Units Only.</strong> Every unit you list must be individually sealed in original packaging — exactly as it left the store. No repackaging or portioning allowed.</span></div>
+      <div class="form-group">
+        <label>Item Name *</label>
+        <input type="text" name="item" placeholder="e.g. LaCroix Sparkling Water" required />
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>Category</label>
+          <select name="category">
+            <option>Pantry & Food</option>
+            <option>Household Essentials</option>
+            <option>Health & Personal Care</option>
+            <option>Pet Supplies</option>
+            <option>Baby & Kids</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Bulk Store</label>
+          <select name="bulk_store">
+            <option>Costco</option>
+            <option>Sam's Club</option>
+            <option>Amazon Bulk</option>
+            <option>Restaurant Depot</option>
+            <option>BJ's Wholesale</option>
+            <option>Boxed.com</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>Total Pack Size</label>
+          <input type="text" name="total_qty" placeholder="e.g. 32-can variety pack" />
+        </div>
+        <div class="form-group">
+          <label>Splittable Unit *</label>
+          <input type="text" name="portion_size" placeholder="e.g. 1 can" required />
+        </div>
+      </div>
+    </div>
+
+    <div class="sell-card">
+      <h2>✂️ Split Details</h2>
+      <div class="model-toggle">
+        <div class="model-option">
+          <input type="radio" id="m-pioneer" name="model" value="pioneer" checked />
+          <label class="model-label" for="m-pioneer">
+            <strong>✅ Pioneer (Ready Now)</strong>
+            <span>Already bought it. Listing units from existing stock.</span>
+          </label>
+        </div>
+        <div class="model-option">
+          <input type="radio" id="m-pool" name="model" value="pool" />
+          <label class="model-label" for="m-pool">
+            <strong>🤝 Pool (Pre-Commit)</strong>
+            <span>Buyers commit first. You buy once the group is full.</span>
+          </label>
+        </div>
+      </div>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>Number of Units to List *</label>
+          <input type="number" name="portions_total" min="1" max="100" value="4" required />
+        </div>
+        <div class="form-group">
+          <label>Your Price Per Unit ($) *</label>
+          <input type="number" name="price_per_portion" step="0.01" min="0.01" placeholder="e.g. 0.41" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Retail Price Per Unit ($)</label>
+        <input type="number" name="retail_price" step="0.01" min="0" placeholder="e.g. 1.49" />
+        <span class="hint">Shows buyers how much they're saving.</span>
+      </div>
+      <div class="markup-notice">🛡️ <span>Splitsy enforces a <strong>markup cap</strong> — your price must stay within a regulated % of your verified receipt cost.</span></div>
+    </div>
+
+    <div class="sell-card">
+      <h2>📍 Pickup</h2>
+      <div class="form-row-2">
+        <div class="form-group">
+          <label>Community *</label>
+          <select name="community_id" required>
+            <option value="">Select community…</option>
+            {% for c in communities %}
+              <option value="{{ c['id'] }}">{{ c['name'] }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Meetup Spot *</label>
+          <input type="text" name="meetup_spot" placeholder="e.g. Building lobby, park bench" required />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Pickup Window *</label>
+        <input type="text" name="pickup_window" placeholder="e.g. Sat Jan 18, 10am–2pm" required />
+      </div>
+    </div>
+
+    <div class="sell-card">
+      <h2>🧾 Receipt Upload</h2>
+      <div class="receipt-box" onclick="alert('In the real app, this uploads your receipt photo for price verification and earns you a Verified Price badge.')">
+        <div class="icon">📸</div>
+        <p>Tap to upload receipt photo</p>
+        <p style="font-size:0.75rem;margin-top:0.3rem;color:var(--text-light);">Verified listings earn a badge and rank higher in search results.</p>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-lg btn-block mb-4">🚀 Post My Split</button>
+  </form>
+</div>
+{% endblock %}

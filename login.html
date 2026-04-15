@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Log In — Splitsy{% endblock %}
+{% block extra_head %}
+<style>
+  .auth-wrap { max-width:420px;margin:3.5rem auto 5rem;padding:0 1.5rem; }
+  .auth-card { background:#fff;border-radius:var(--radius-xl);box-shadow:var(--shadow-lg);overflow:hidden; }
+  .auth-top { background:linear-gradient(135deg,var(--c5),var(--c4));padding:2rem 2rem 1.5rem;text-align:center; }
+  .auth-top .logo { font-family:var(--font-display);font-size:1.8rem;font-weight:900;color:#fff; }
+  .auth-top .logo span { color:var(--c1); }
+  .auth-top p { color:rgba(255,255,255,0.7);font-size:0.9rem;margin-top:0.3rem; }
+  .auth-body { padding:2rem; }
+  .auth-body h2 { font-family:var(--font-display);font-size:1.4rem;font-weight:700;margin-bottom:1.5rem; }
+  .demo-hint { background:#f4f9f5;border:1.5px solid var(--c2);border-radius:var(--radius-md);padding:0.85rem 1rem;font-size:0.82rem;color:var(--c4);margin-bottom:1.25rem; }
+  .auth-footer { text-align:center;margin-top:1.25rem;font-size:0.88rem;color:var(--text-light); }
+  .auth-footer a { color:var(--c3);font-weight:600; }
+</style>
+{% endblock %}
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <div class="auth-top">
+      <div class="logo">🛒 Splits<span>y</span></div>
+      <p>Split the haul. Share the savings.</p>
+    </div>
+    <div class="auth-body">
+      <h2>Welcome back</h2>
+      <div class="demo-hint">
+        🎯 <strong>Demo login:</strong> demo@splitsy.com &nbsp;/&nbsp; demo123
+      </div>
+      <form method="POST" action="/login">
+        <div class="form-group">
+          <label>Email address</label>
+          <input type="email" name="email" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg btn-block mt-2">Log In</button>
+      </form>
+      <div class="auth-footer">
+        Don't have an account? <a href="/signup">Sign up free →</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
